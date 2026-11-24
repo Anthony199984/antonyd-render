@@ -1,0 +1,21 @@
+name: Publicar video
+on:
+  push:
+    branches: [subida]
+permissions:
+  contents: write
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: subida
+      - run: |
+          cat trevor.parte_* > Trevor_1440p.mp4
+          sha256sum -c sha256.txt
+          gh release delete video --yes --cleanup-tag 2>/dev/null || true
+          gh release create video Trevor_1440p.mp4 --title "Trevor 1440p" --notes "Video completo en 1440p, sin comprimir." --target subida
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
