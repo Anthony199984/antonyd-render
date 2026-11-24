@@ -1,0 +1,24 @@
+name: Entrega
+on: push
+permissions:
+  contents: write
+  actions: read
+jobs:
+  entrega:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: 01-gta_1440p
+          run-id: 45304134567
+          github-token: ${{ github.token }}
+          path: v
+      - run: |
+          ls -la v
+          mkdir /tmp/e && cd /tmp/e
+          split -b 90m -d -a 2 "$GITHUB_WORKSPACE/v/01-gta_1440p.mp4" trevor_1440p.mp4.parte_
+          sha256sum "$GITHUB_WORKSPACE/v/01-gta_1440p.mp4" > sha256.txt
+          git init -q && git checkout -q -b entrega
+          git config user.name "render-2d" && git config user.email "render@antonyd"
+          git add . && git commit -q -m "entrega"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" entrega
